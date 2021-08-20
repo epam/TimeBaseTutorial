@@ -5,7 +5,6 @@ import com.epam.deltix.qsrv.hf.tickdb.pub.*;
 import org.junit.After;
 import org.junit.Before;
 
-
 public abstract class TDBTestBase {
 
     protected final String               user;
@@ -30,6 +29,7 @@ public abstract class TDBTestBase {
 
     @Before
     public void startup() throws Exception {
+        //DockerRunner.start();
         db = createClient();
     }
 
@@ -37,12 +37,13 @@ public abstract class TDBTestBase {
     public void shutdown() throws Exception {
         if (db != null)
             db.close();
+
+        //DockerRunner.stop();
     }
 
     public DXTickDB getTickDb() {
         return db;
     }
-
 
     /*
         Create new stream and delete previous with given key

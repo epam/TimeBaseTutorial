@@ -1,6 +1,5 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0'
-    id 'java'
     id 'java-library'
 }
 
@@ -31,6 +30,11 @@ dependencies {
     implementation 'com.google.guava:guava:20.0'
 
     testImplementation 'junit:junit:4.12'
+
+    testImplementation "org.testcontainers:testcontainers:1.16.0"
+
+    testImplementation ("org.springframework:spring-context:${springVersion}")
+    testImplementation ("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
 }
 
 //resolutionStrategy {
@@ -61,3 +65,5 @@ task copyLibs(type: Sync) {
 
     into libDirectory
 }
+
+test.onlyIf { Boolean.getBoolean('tests.run') }
