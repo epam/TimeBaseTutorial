@@ -1,0 +1,63 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'java'
+    id 'java-library'
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    api "org.finos.timebase-ce:timebase-client:${timebaseVersion}"
+    api "org.finos.timebase-ce:timebase-api:${timebaseVersion}"
+    api "org.finos.timebase-ce:timebase-pub:${timebaseVersion}"
+    api "org.finos.timebase-ce:timebase-aerondirect:${timebaseVersion}"
+
+    api "com.epam.deltix:containers:3.1.2"
+
+    implementation "com.epam.deltix:timebase-lang:${commonsVersion}"
+    implementation "com.epam.deltix:timebase-util:${commonsVersion}"
+    implementation "com.epam.deltix:timebase-messages:${commonsVersion}"
+    implementation "com.epam.deltix:timebase-collections:${commonsVersion}"
+
+    implementation 'com.epam.deltix:dfp:0.11.01'
+    implementation "com.epam.deltix:gflog-api:${gflogVersion}"
+
+    implementation 'com.google.guava:guava:20.0'
+
+    testImplementation 'junit:junit:4.12'
+}
+
+//resolutionStrategy {
+//    // Disable this line on case of version conflict and then run :dependency task OR execute build with --scan option
+//    failOnVersionConflict()
+//}
+
+// ZIP with sample 
+task makeZIP(type: Zip) {
+    baseName = 'deltix-timebase-tutorial'
+
+    from('.') {
+        include '**/*'
+        exclude '.git/'
+        exclude '.gradle/'
+        exclude '.idea/libraries/'
+        exclude '.idea/vcs.xml'
+        exclude 'build/'
+        exclude 'out/'
+    }
+}
+
+def libDirectory = new File(projectDir, 'lib')
+
+task copyLibs(type: Sync) {
+    from configurations.runtimeClasspath
+    from project.jar.outputs.files
+
+    into libDirectory
+}
