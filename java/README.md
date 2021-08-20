@@ -18,5 +18,9 @@ You can also build and run these samples from IntelliJ/IDEA Community Edition
 
 ### Run
 
-* Samples assume TimeBase is running locally on port 8011. Edit source code if this is not the case.
+* Start Timebase Docker image
+  ```  
+   docker run --rm -d -p 8011:8011 --name=timebase-server --ulimit nofile=65536:65536 finos/timebase-ce-server:latest
+   ```
+* Run any sample
 
