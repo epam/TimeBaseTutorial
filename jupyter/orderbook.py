@@ -28,13 +28,13 @@ class Book:
         for entry in entries:
             if entry['side'] == 'BID':
                 self.bids[entry['price']] = entry
-            elif entry['side'] == 'ASK':
+            else:
                 self.asks[entry['price']] = entry
     
     def remove(self, side: str, price: float) -> None:
         if side == 'BID':
             self.bids.pop(price, None)
-        elif side == 'ASK':
+        else:
             self.asks.pop(price, None)
     
     def get_bids(self, size=-1) -> List[dict]:
