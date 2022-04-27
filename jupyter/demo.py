@@ -1,6 +1,6 @@
 # deltix TimeBase client
-import dxapi
-from dxapi import InstrumentMessage, InstrumentType, InstrumentIdentity
+import tbapi
+from tbapi import InstrumentMessage
 
 # FINOS Perspective
 import perspective
@@ -92,15 +92,15 @@ class Demo:
         
 
     def init_book(self):
-        db = dxapi.TickDb_createFromUrl(self.tb_url)
+        db = tbapi.TickDb_createFromUrl(self.tb_url)
         try:
             db.open(True)
             stream = db.getStream(self.stream_key)
-            options = dxapi.SelectionOptions()
+            options = tbapi.SelectionOptions()
             try:
                 cursor = db.select(current_milli_time() - 10000, [stream], options, 
                                    [self.record_type], 
-                                   [InstrumentIdentity(InstrumentType.FX, self.symbol)])
+                                   [self.symbol])
                 while cursor.next():
                     msg = cursor.getMessage()
                     if msg.packageType == 'PERIODICAL_SNAPSHOT':
@@ -113,16 +113,16 @@ class Demo:
             
     
     async def read_cursor(self):
-        db = dxapi.TickDb_createFromUrl(self.tb_url)
+        db = tbapi.TickDb_createFromUrl(self.tb_url)
         try:
             db.open(True)
             stream = db.getStream(self.stream_key)
-            options = dxapi.SelectionOptions()
+            options = tbapi.SelectionOptions()
             options.live = True
             try:
                 cursor = db.select(current_milli_time(), [stream], options, 
                                    [self.record_type], 
-                                   [InstrumentIdentity(InstrumentType.FX, self.symbol)])
+                                   [self.symbol])
                 initialized = False
                 while cursor.next() and not self.stop_reading and not initialized:
                     msg = cursor.getMessage()
