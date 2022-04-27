@@ -1,11 +1,11 @@
 CREATE DURABLE STREAM "bars1min" 'bars1min' (
-    CLASS "deltix.timebase.api.messages.MarketMessage" 'Market Message' (
+    CLASS "com.epam.deltix.timebase.api.messages.MarketMessage" 'Market Message' (
         STATIC "originalTimestamp" TIMESTAMP = NULL,
         STATIC "currencyCode" 'Currency Code' INTEGER = 999,
         STATIC "sequenceNumber" '' INTEGER = NULL,
         STATIC "sourceId" '' VARCHAR = NULL
     ) NOT INSTANTIABLE;
-    CLASS "deltix.timebase.api.messages.BarMessage" 'Bar Message' UNDER "deltix.timebase.api.messages.MarketMessage" (
+    CLASS "com.epam.deltix.timebase.api.messages.BarMessage" 'Bar Message' UNDER "com.epam.deltix.timebase.api.messages.MarketMessage" (
         STATIC "exchangeId" 'Exchange Code' VARCHAR = NULL,
         "close" 'Close' FLOAT DECIMAL,
         "open" 'Open' FLOAT DECIMAL RELATIVE TO "close",

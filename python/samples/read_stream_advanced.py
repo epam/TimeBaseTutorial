@@ -4,14 +4,14 @@ import time
 import calendar
 from datetime import datetime
 
-import dxapi
+import tbapi
 
 # Timebase URL specification, pattern is "dxtick://<host>:<port>"
 timebase = 'dxtick://localhost:8011'
 
 try:
     # Create timebase connection
-    db = dxapi.TickDb.createFromUrl(timebase)
+    db = tbapi.TickDb.createFromUrl(timebase)
     
     # Open in read-only mode
     db.open(True)
@@ -19,26 +19,23 @@ try:
     print('Connected to ' + timebase)
 
     # Define name of the stream    
-    streamKey = 'ticks'
+    streamKey = 'bitfinex'
 
     # Get stream from the timebase
     stream = db.getStream(streamKey)    
        	
     # Create cursor with empty subscription
-    cursor = db.createCursor(None, dxapi.SelectionOptions())
+    cursor = db.createCursor(None, tbapi.SelectionOptions())
 
     # Create subscription dynamically
     # 1. Add entities
-    entities = [
-        dxapi.InstrumentIdentity(dxapi.InstrumentType.EQUITY, 'AAA'),
-        dxapi.InstrumentIdentity(dxapi.InstrumentType.EQUITY, 'AAPL')
-    ]
+    entities = ['BTC/USD', 'BTC/EUR']
     cursor.addEntities(entities)
     
     # 2. Subscribe to the Trade and BestBidOffer Messages
     types = [
-        'deltix.timebase.api.messages.TradeMessage',
-        'deltix.timebase.api.messages.BestBidOfferMessage'
+        'com.epam.deltix.timebase.messages.universal.PackageHeader',
+        'com.epam.deltix.timebase.messages.service.SecurityFeedStatusMessage'
     ]
     cursor.addTypes(types)
 
@@ -61,12 +58,20 @@ try:
             time = message.timestamp/1e9
             messageTime = datetime.utcfromtimestamp(time)
             
-            if message.typeName == 'deltix.timebase.api.messages.TradeMessage':
-                print("Trade (" + str(messageTime) + "," + message.symbol + ") price: " + str(message.price))
-            elif message.typeName == 'deltix.timebase.api.messages.BestBidOfferMessage':
-                print("BBO (" + str(messageTime) + "," + message.symbol + ") bid price: " + str(message.bidPrice) + ", ask price: " + str(message.offerPrice))                    
-        
-        
+            if message.typeName == 'com.epam.deltix.timebase.messages.universal.PackageHeader':
+                print("================================================")
+                print("PackageHeader timestamp: " + str(messageTime) + ", symbol: " + message.symbol + ", package type: " + message.packageType)
+                for entry in message.entries:
+                    if entry.typeName == 'com.epam.deltix.timebase.messages.universal.L2EntryNew':
+                        print("NEW: " + str(entry.level) + ": " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
+                    elif entry.typeName == 'com.epam.deltix.timebase.messages.universal.L2EntryUpdate':
+                        print("UPDATE [" + entry.action + "]: " + str(entry.level) + ": " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
+                    elif entry.typeName == 'com.epam.deltix.timebase.messages.universal.L1Entry':
+                        print("L1Entry: " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
+                    elif entry.typeName == 'com.epam.deltix.timebase.messages.universal.TradeEntry':
+                        print("Trade: " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
+            elif message.typeName == 'com.epam.deltix.timebase.messages.service.SecurityFeedStatusMessage':
+                print("FeedStatus (" + str(messageTime) + "): " + str(message.status))               
     finally:
         # cursor should be closed anyway
         cursor.close()

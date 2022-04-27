@@ -1,7 +1,13 @@
 # Python Timebase Clinent samples
 
-Install python dxapi package from nexus repository first:
+Install python timebase-client package from pipy repository first:
 
 ```
-pip install dxapi -i https://nexus.epm-ces.projects.epam.com/repository/rtc-pypl-test/simple
+Will be added soon.
+```
+
+Install python timebase-client from github release:
+
+```
+https://github.com/epam/TimeBaseClientPython/tags
 ```

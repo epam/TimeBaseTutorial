@@ -1,12 +1,13 @@
 import sys, os, struct
-import dxapi
+
+import tbapi
 
 # Timebase URL specification, pattern is "dxtick://<host>:<port>"
 timebase = 'dxtick://localhost:8011'
 
 try:
     # Create timebase connection
-    db = dxapi.TickDb.createFromUrl(timebase)
+    db = tbapi.TickDb.createFromUrl(timebase)
 
     # Open in read-only mode
     db.open(True)
