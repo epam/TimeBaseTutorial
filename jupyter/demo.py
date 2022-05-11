@@ -44,7 +44,7 @@ class Demo:
             'price': float,
             'numberOfOrders': int
         }
-        self.table = Table(self.schema, limit=booksize * 3, index='key')
+        self.table = Table(self.schema, limit=1000, index='key')
         self.book = Book(symbol)
         self.last_updated = 0
         self.stop_reading = False
@@ -92,7 +92,7 @@ class Demo:
         
 
     def init_book(self):
-        db = tbapi.TickDb_createFromUrl(self.tb_url)
+        db = tbapi.TickDb.createFromUrl(self.tb_url)
         try:
             db.open(True)
             stream = db.getStream(self.stream_key)
@@ -113,7 +113,7 @@ class Demo:
             
     
     async def read_cursor(self):
-        db = tbapi.TickDb_createFromUrl(self.tb_url)
+        db = tbapi.TickDb.createFromUrl(self.tb_url)
         try:
             db.open(True)
             stream = db.getStream(self.stream_key)
@@ -175,4 +175,3 @@ class Demo:
     def clear(self):
         self.table.clear()
         self.book.clear()
-    
