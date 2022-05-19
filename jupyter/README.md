@@ -1,5 +1,9 @@
 # Jupyterlab Timebase Clinent samples
 
+## How to configure jupyterlab
+
+Python 3.8+ is required
+
 1) install jupyterlab from pip:
 ```
    pip install jupyterlab==3.4.0
@@ -10,7 +14,11 @@
    pip install perspective-python==1.3.5
 ```
 
-5) install all missing python modules (like `ipywidgets`, `sortedcollections`, etc)
+5) install additional python modules if not installed (`ipywidgets`, `sortedcollections`)
+```
+   pip install ipywidgets
+   pip install sortedcollections
+```
 
 7) install npm to be able to install jupyter extensions
 
@@ -18,4 +26,20 @@
 ```
 jupyter labextension install @finos/perspective-jupyterlab@1.3.12
 jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.1.0
+```
+
+9) start jupyter lab from this directory:
+```
+jupyter-lab
+```
+
+## How to build docker image
+
+1) copy timebase client python package `timebase_client-6.0.1-py2.py3-none-any.whl`
+from https://github.com/epam/TimeBaseClientPython/releases/tag/6.0.1 into this directory.
+Note, that this step is temporary until timebase client will be published into pypi.
+
+2) build docker image
+```
+docker build -t jupyter-test:1.0 .
 ```
