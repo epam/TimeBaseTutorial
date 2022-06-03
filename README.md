@@ -4,6 +4,9 @@
    
    Timebase samples for python, java and jupiter notebook
    
+   https://github.com/finos/TimeBase-CE
+   
+   https://kb.timebase.info/community/development/libs   
   
 ### Requirements
 
