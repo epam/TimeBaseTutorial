@@ -4,7 +4,7 @@
 
 There are 2 ways to install python client:
 
-1) Install python timebase-client package from pipy repository first:
+1) Install python timebase-client package from pipy repository:
 
 ```
 Will be added soon.
