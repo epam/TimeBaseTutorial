@@ -1,0 +1,58 @@
+{{- if and .Values.cleaner.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "chart.fullname" . }}-cleaner
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: cleaner
+    {{- include "chart.labels" $ | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  schedule: {{ .Values.cleaner.schedule | default "0 7 * * *" | quote }}
+  jobTemplate:
+    spec:
+      backoffLimit: 5
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/component: cleaner
+            {{- include "chart.labels" . | nindent 12 }}
+          {{- if .Values.cleaner.podAnnotations }}
+          annotations: {{- toYaml .Values.cleaner.podAnnotations | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- if .Values.global.imagePullSecrets }}
+          imagePullSecrets: {{ include "chart.imagePullSecrets" . | trim | nindent 10 }}
+          {{- end }}
+          restartPolicy: Never
+          containers:
+            - name: timebase-cleaner
+              image: {{ .Values.cleaner.image }}
+              imagePullPolicy: {{ .Values.cleaner.imagePullPolicy }}
+              command:
+                - /bin/sh
+              args:
+                - -c
+                - /timebase-client/bin/purge.sh
+              env:
+                - name: PURGE_TIMEBASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ template "chart.fullname" . }}-server
+                      key: TIMEBASE_URL
+                - name: PURGE_DAYS_TO_KEEP
+                  value: {{ .Values.cleaner.daystoKeep | quote }}
+                {{- if .Values.cleaner.streams }}
+                - name: PURGE_STREAMS
+                  value: |
+                   {{- range $stream, $day := .Values.cleaner.streams }}
+                   {{- printf "%s:%v;" $stream $day | nindent 20 -}}
+                   {{ end -}}
+                {{- end -}}
+                {{- if .Values.cleaner.exceptStreams }}
+                - name: PURGE_EXCEPT_STREAMS
+                  value: {{- include "cleanExceptScripts" $ | quote | indent 1 -}}
+                {{- end -}}
+{{- end }}

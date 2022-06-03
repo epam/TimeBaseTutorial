@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "chart.fullname" . }}-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    {{- include "chart.labels" . | nindent 4 }}
+data:
+  admin.properties: |
+    TimeBase.enableRemoteAccess={{ .Values.server.properties.enableRemoteAccess }}
+    TimeBase.lingerInterval={{ .Values.server.properties.lingerInterval }}
+    TimeBase.maxConnections={{ .Values.server.properties.maxConnections }}
+    TimeBase.port=8011
+    TimeBase.readOnly={{ .Values.server.properties.readOnly }}
+    TimeBase.safeMode={{ .Values.server.properties.safeMode }}
+    TimeBase.version={{ .Values.server.version }}
+  {{- if or .Values.server.user .Values.server.oauth }}
+  {{- if .Values.server.oauth }}
+    QuantServer.security=OAUTH
+  {{- else }}
+    QuantServer.security=FILE
+  {{- end }}
+    QuantServer.security.tbLogin=TBLogin
+    QuantServer.security.userDirectoryConfig=uac-file-security.xml
+    QuantServer.security.rulesConfig=uac-access-rules.xml
+    QuantServer.security.updateInterval=1H
+
+  uac-access-rules.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <rules xmlns="http://xml.deltixlab.com/internal/quantserver/3.0">
+            <allow>
+                <principal>Administrators</principal>
+                <permission>*</permission>
+                <resource>*</resource>
+            </allow>
+            <allow>
+                <principal>ReadOnly</principal>
+                <permission>READ</permission>
+                <resource>*</resource>
+            </allow>
+        </rules>
+  uac-file-security.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <config xmlns="http://xml.deltixlab.com/internal/quantserver/3.0">
+        <users>
+            <user id="${TIMEBASE_USERNAME}">
+                <password>${TIMEBASE_PASSWORD}</password>
+            </user>
+    {{- range $user, $password := .Values.server.adminUsers }}
+            <user id="{{ $user }}">
+                <password>${PASSWORD_{{ $user | upper }}}</password>
+            </user>
+    {{- end }}
+    {{- range $user, $password := .Values.server.readOnlyUsers }}
+            <user id="{{ $user }}">
+                <password>${PASSWORD_{{ $user | upper }}}</password>
+            </user>
+    {{- end }}
+        </users>
+        <groups>
+            <group id="Administrators">
+                <principal>${TIMEBASE_USERNAME}</principal>
+           {{- range $user, $password := .Values.server.adminUsers }}
+                <principal>{{ $user }}</principal>
+           {{- end }}
+            </group>
+        {{- if .Values.server.readOnlyUsers }}
+            <group id="ReadOnly">
+           {{- range $user, $password := .Values.server.readOnlyUsers }}
+                <principal>{{ $user }}</principal>
+           {{- end }}
+            </group>
+          {{- end }}
+        </groups>
+  {{- if .Values.server.oauth }}
+        <oauthSettings>
+          <issuer>{{ .Values.server.oauth.issuer }}</issuer>
+          <jwksUrl>{{ .Values.server.oauth.jwksUrl }}</jwksUrl>
+    {{- range .Values.server.oauth.clientId }}
+          <clientId>{{ . }}</clientId>
+    {{- end }}
+        </oauthSettings>
+  {{- end }}
+    </config>
+  {{- end }}

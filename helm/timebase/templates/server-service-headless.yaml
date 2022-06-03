@@ -1,0 +1,25 @@
+{{- if .Values.headless }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "chart.fullname" . }}-headless
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    {{- include "chart.labels" . | nindent 4 }}
+  {{- if .Values.headless.annotations }}
+  annotations:
+  {{- range $key, $value := .Values.headless.annotations }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  ports:
+  - port: 8011
+    name: timebase
+  selector:
+    app.kubernetes.io/component: server
+    {{- include "chart.matchLabels" $ | nindent 4 }}
+  type: ClusterIP
+  clusterIP: None
+{{ end }}

@@ -12,19 +12,19 @@ repositories {
 
 dependencies {
 
-    api "org.finos.timebase-ce:timebase-client:${timebaseVersion}"
-    api "org.finos.timebase-ce:timebase-api:${timebaseVersion}"
-    api "org.finos.timebase-ce:timebase-pub:${timebaseVersion}"
-    api "org.finos.timebase-ce:timebase-aerondirect:${timebaseVersion}"
-
-    api "com.epam.deltix:containers:3.1.2"
-
-    implementation "com.epam.deltix:timebase-lang:${commonsVersion}"
-    implementation "com.epam.deltix:timebase-util:${commonsVersion}"
-    implementation "com.epam.deltix:timebase-messages:${commonsVersion}"
-    implementation "com.epam.deltix:timebase-collections:${commonsVersion}"
-
-    implementation 'com.epam.deltix:dfp:0.11.01'
+    compile "org.finos.timebase-ce:timebase-client:${timebaseVersion}"
+//    api "org.finos.timebase-ce:timebase-api:${timebaseVersion}"
+//    api "org.finos.timebase-ce:timebase-pub:${timebaseVersion}"
+//    api "org.finos.timebase-ce:timebase-aerondirect:${timebaseVersion}"
+//
+    compile "com.epam.deltix:containers:3.1.2"
+//
+//    implementation "com.epam.deltix:timebase-lang:${commonsVersion}"
+//    implementation "com.epam.deltix:timebase-util:${commonsVersion}"
+//    implementation "com.epam.deltix:timebase-messages:${commonsVersion}"
+//    implementation "com.epam.deltix:timebase-collections:${commonsVersion}"
+//
+//    implementation 'com.epam.deltix:dfp:0.11.01'
     implementation "com.epam.deltix:gflog-api:${gflogVersion}"
 
     implementation 'com.google.guava:guava:20.0'

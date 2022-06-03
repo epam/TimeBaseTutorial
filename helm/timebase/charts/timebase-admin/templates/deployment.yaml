@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: web-admin
+    {{- include "chart.labels" . | nindent 4 }}
+  name: {{ template "chart.fullname" . }}-admin
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: web-admin
+      {{- include "chart.matchLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: web-admin
+        {{- include "chart.labels" $ | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
+      {{- if .Values.podAnnotations }}
+      annotations: {{- toYaml .Values.podAnnotations | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if .Values.affinity }}
+      affinity: {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ include "chart.imagePullSecrets" . | trim | nindent 6 }}
+      {{- end }}
+      containers:
+      - name: timebase-admin
+        image: {{ .Values.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        resources: {{- toYaml .Values.resources | nindent 10 }}
+        envFrom:
+          - secretRef:
+              name: {{ template "chart.fullname" . }}-admin
+        env:
+        - name: JAVA_OPTS
+          value: |
+             -Dserver.port=8099 -XX:+ExitOnOutOfMemoryError -Dnetworkaddress.cache.ttl=60s -XX:+AlwaysActAsServerClassMachine
+             -Dgflog.app={{ .Values.logs.app }} -Dgflog.config=/opt/epm-rtc/gflog.xml -Dgflog.logLevel={{ .Values.logs.logLevel }} -Dgflog.maxEntriesPerSecond={{ .Values.logs.maxEntriesPerSecond }}
+          {{- if .Values.heapSize -}}
+            {{ printf " -Xms%s -Xmx%s" .Values.heapSize .Values.heapSize }}
+          {{- else -}}
+            {{ printf " -XX:+UseContainerSupport -XX:InitialRAMPercentage=40.0 -XX:MaxRAMPercentage=75.0"}}
+          {{- end }}
+        {{- range $name, $value := .Values.env }}
+        - name: {{ $name }}
+          value: {{ $value | quote }}
+        {{- end }}
+
+
+        volumeMounts:
+        - name: gflog
+          mountPath: /opt/epm-rtc/gflog.xml
+          subPath: gflog.xml
+
+      volumes:
+      - name: gflog
+        configMap:
+          name: {{ template "chart.fullname" . }}-gflog-admin

@@ -1,0 +1,31 @@
+{{- if .Values.server.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ printf "timebase-%s-%s" .Release.Namespace ( include "chart.fullname" $ ) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Values.server.serviceMonitor.namespace }}
+  labels:
+    {{- toYaml .Values.server.serviceMonitor.labels | nindent 4 }}
+spec:
+  endpoints:
+  - interval:  {{ .Values.server.serviceMonitor.interval }}
+    port: timebase
+    path: '/tb/metrics'
+    {{- if or .Values.server.user .Values.server.password }}
+    basicAuth:
+      username:
+        key: TIMEBASE_USERNAME
+        name: {{ template "chart.fullname" . }}-server
+      password:
+        key: TIMEBASE_PASSWORD
+        name: {{ template "chart.fullname" . }}-server
+    {{ end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: server
+      servicemonitor: "true"
+      {{- include "chart.matchLabels" $ | nindent 6 }}
+{{ end }}

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "chart.fullname" . }}-gflog-admin
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+data:
+  gflog.xml: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <config>
+      <appender name="consoleAppender" factory="com.epam.deltix.gflog.core.appender.ConsoleAppenderFactory">
+        <layout template="%d{yyyy-MM-dd HH:mm:ss.SSS} %p [%t]: %m%n" zoneId="UTC"/>
+      </appender>
+  {{- if and .Values.global.logs.gelf .Values.logs.gelf }}
+      <appender name="gelf" factory="com.epam.deltix.gflog.core.appender.TcpAppenderFactory" host="{{ default .Values.global.logs.host .Values.logs.host }}" port="{{ default .Values.global.logs.port .Values.logs.port }}">
+        <layout factory="com.epam.deltix.gflog.core.layout.GelfLayoutFactory">
+          <additional-fields>
+            <entry key="app" value="${gflog.app}"/>
+            <entry key="release" value={{ .Release.Name | quote }}/>
+            <entry key="namespace" value={{ .Release.Namespace | quote }}/>
+          </additional-fields>
+        </layout>
+      </appender>
+  {{- end }}
+      <appender name="safeAppender" factory="com.epam.deltix.gflog.core.appender.SafeAppenderFactory" maxEntriesPerSecond="${gflog.maxEntriesPerSecond}">
+        <appender-ref ref="consoleAppender"/>
+  {{- if and .Values.global.logs.gelf .Values.logs.gelf }}
+        <appender-ref ref="gelf"/>
+  {{- end }}
+      </appender>
+      <logger level="${gflog.logLevel}">
+        <appender-ref ref="safeAppender"/>
+      </logger>
+      <service overflowStrategy="DISCARD"/>
+    </config>

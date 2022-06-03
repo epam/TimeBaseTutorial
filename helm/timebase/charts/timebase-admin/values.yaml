@@ -1,0 +1,83 @@
+global:
+  imagePullSecrets: []
+    # - epm-rtc
+  secret:
+    create: true
+  logs:
+    gelf: true
+    host: "graylog.internal"
+    port: "12201"
+
+fullnameOverride: ""
+nameOverride: ""
+affinity: {}
+
+
+image: epam/timebase-ws-server:1.0.2
+imagePullPolicy: IfNotPresent
+# resources -- Configure the resources for the timebase web admin
+resources:
+  requests:
+    cpu: 0.2
+    memory: 256Mi
+  limits:
+    cpu: 1
+    memory: 1Gi
+
+# podLabels -- Additional pod labels
+podLabels: {}
+podAnnotations: {}
+env: {}
+
+headless:
+  enabled: false
+  annotations: {}
+
+secret:
+  create: true
+  records:
+    SECURITY_OAUTH2_USERS_0_USERNAME: admin
+    # bcrypt(10) admin
+    SECURITY_OAUTH2_USERS_0_PASSWORD: "$2y$10$B8iNWMVVfsFDw/HfmRfITue17k7yfnisO92Q93KcB31/qLWKw.XtS"
+    SECURITY_OAUTH2_USERS_0_AUTHORITIES: "TB_ALLOW_READ, TB_ALLOW_WRITE"
+
+
+logs:
+  gelf: true
+  host: ""
+  port: ""
+  logLevel: INFO # log level is set to INFO by Default
+  maxEntriesPerSecond: 300 # max entries is set to 300 by Default
+  app: timebase-admin
+
+ingress:
+  enabled: false
+  # Values can be templated
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /*
+  hosts:
+    - chart-example.local
+  ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  extraPaths: []
+  # - path: /*
+  #   backend:
+  #     serviceName: ssl-redirect
+  #     servicePort: use-annotation
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+# headless:
+#   annotations:
+#     external-dns.alpha.kubernetes.io/ttl: "30"
+
+
+server:
+  host: "timebase"
+  port: "8011"
+  user: ""
+  password: ""

@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "chart.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    {{- include "chart.labels" $ | nindent 4 }}
+spec:
+  serviceName: {{ template "chart.fullname" . }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: server
+      {{- include "chart.matchLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: server
+        {{- include "chart.labels" . | nindent 8 }}
+        {{- if .Values.server.podLabels }}
+        {{- toYaml .Values.server.podLabels | nindent 8 }}
+        {{- end }}
+      {{- if .Values.server.podAnnotations }}
+      annotations: {{- toYaml .Values.server.podAnnotations | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ include "chart.imagePullSecrets" . | trim | nindent 6 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity: {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.server.initContainers }}
+      initContainers: {{- toYaml .Values.server.initContainers | nindent 8 }}
+      {{- end }}
+      {{- if .Values.server.securityContext }}
+      securityContext: {{- toYaml .Values.server.securityContext | nindent 8 }}
+      {{- end }}
+
+      containers:
+      - name: timebase
+        image: {{ .Values.server.image }}
+        imagePullPolicy: {{ .Values.server.imagePullPolicy }}
+        resources: {{- toYaml .Values.server.resources | nindent 10 }}
+        envFrom:
+          - secretRef:
+              name: {{ template "chart.fullname" . }}-server
+          - secretRef:
+              name: {{ template "chart.fullname" . }}-custom-user
+        env:
+        - name: JAVA_OPTS
+          value: |
+            -XX:+ExitOnOutOfMemoryError -Dnetworkaddress.cache.ttl=60s -XX:+AlwaysActAsServerClassMachine
+            -Dgflog.app={{ .Values.server.logs.app }} -Dgflog.config=/timebase-home/config/gflog.xml -Dgflog.logLevel={{ .Values.server.logs.logLevel }} -Dgflog.maxEntriesPerSecond={{ .Values.server.logs.maxEntriesPerSecond }}
+          {{- if .Values.server.debug }}
+            -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError
+            -XX:HeapDumpPath=/timebase-home/java.hprof
+            -XX:OnOutOfMemoryError="mv /timebase-home/java.hprof /timebase-home/heapdump.hprof"
+          {{- end }}
+          {{- if .Values.server.heapSize -}}
+            {{ printf " -Xms%s -Xmx%s" .Values.server.heapSize .Values.server.heapSize }}
+            {{- else }}
+            -XX:InitialRAMPercentage=40.0 -XX:MaxRAMPercentage=75.0
+          {{- end }}
+            -Dgflog.app={{ .Values.server.logs.app }} -Dgflog.config=/timebase-home/config/gflog.xml -Dgflog.logLevel={{ .Values.server.logs.logLevel }} -Dgflog.maxEntriesPerSecond={{ .Values.server.logs.maxEntriesPerSecond }}
+          {{- if .Values.server.serviceMonitor.enabled }}
+            -DTimeBase.metrics.enable=true -DTimeBase.metrics.gatherJvmMetrics=true
+          {{- end }}
+        command: ["/bin/sh"]
+        args: ["-c","/timebase-server/bin/tdbserver.sh ${JAVA_OPTS} -tb -home /timebase-home"]
+        volumeMounts:
+          - mountPath: /timebase-home
+            name: {{ template "chart.fullname" . }}-vol
+          - mountPath: /timebase-home/config/admin.properties
+            name: config
+            subPath: admin.properties
+        {{- if or .Values.server.user .Values.server.password }}
+          - mountPath: /timebase-home/config/uac-file-security.xml
+            name: config
+            subPath: uac-file-security.xml
+          - mountPath: /timebase-home/config/uac-access-rules.xml
+            name: config
+            subPath: uac-access-rules.xml
+        {{- end }}
+          - name: gflog
+            mountPath: /timebase-home/config/gflog.xml
+            subPath: gflog.xml
+
+
+        ports:
+          - containerPort: 8011
+      terminationGracePeriodSeconds: {{ .Values.server.gracefulShutdownTime }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "chart.fullname" . }}-server
+            items:
+              - key: admin.properties
+                path: admin.properties
+                mode: 292 # 0444
+        {{- if or .Values.server.user .Values.server.password }}
+              - key: uac-file-security.xml
+                path: uac-file-security.xml
+                mode: 292 # 0444
+              - key: uac-access-rules.xml
+                path: uac-access-rules.xml
+                mode: 292 # 0444
+        {{- end }}
+
+        - name: gflog
+          configMap:
+            name: {{ template "chart.fullname" . }}-gflog-config
+
+
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ template "chart.fullname" . }}-vol
+    spec:
+      accessModes:
+        - {{ .Values.server.persistence.accessModes | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.server.persistence.size | quote }}
+    {{- if .Values.server.persistence.storageClass }}
+    {{- if (eq "-" .Values.server.persistence.storageClass) }}
+      storageClassName: ""
+    {{- else }}
+      storageClassName: "{{ .Values.server.persistence.storageClass }}"
+    {{- end }}
+    {{- end }}

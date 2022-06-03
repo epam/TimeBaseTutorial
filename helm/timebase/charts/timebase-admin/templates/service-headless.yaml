@@ -1,0 +1,24 @@
+{{- if .Values.headless.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "chart.fullname" . }}-admin-headless
+  labels:
+    app.kubernetes.io/component: web-admin
+    {{- include "chart.labels" $ | nindent 4 }}
+  {{- if .Values.headless.annotations }}
+  annotations:
+  {{- range $key, $value := .Values.headless.annotations }}
+    {{ $key }}: {{ tpl $value $ | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  ports:
+  - port: 8099
+    name: timebase-admin
+  selector:
+    app.kubernetes.io/component: web-admin
+    {{- include "chart.matchLabels" $ | nindent 4 }}
+  type: ClusterIP
+  clusterIP: None
+{{ end }}

@@ -1,0 +1,23 @@
+{{- if .Values.loadBalancer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "chart.fullname" . }}-external
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    {{- include "chart.labels" . | nindent 4 }}
+  annotations:
+    {{ .Values.loadBalancer.annotations | toYaml | nindent 4 }}
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/component: server
+    {{- include "chart.matchLabels" $ | nindent 4 }}
+  ports:
+  - port: 8011
+    name: timebase
+  {{- if .Values.loadBalancer.spec }}
+  {{ .Values.loadBalancer.spec | toYaml | nindent 2 }}
+  {{- end }}
+{{ end }}

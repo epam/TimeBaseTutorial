@@ -1,0 +1,214 @@
+global:
+  imagePullSecrets: []
+  #  - epm-rtc
+  secret:
+    create: true
+  logs:
+    gelf: true
+    host: "graylog.internal"
+    port: "12201"
+
+fullnameOverride: ""
+nameOverride: ""
+affinity: {}
+
+storageClass:
+  # storageClass.create -- Set to true to creating the StorageClass automatically
+  create: true
+  # storageClass.create - Provisioner https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner
+  provisionerName: kubernetes.io/aws-ebs
+
+  # storageClass.defaultClass -- Set StorageClass as the default StorageClass
+  defaultClass: false
+
+  # storageClass.name -- Set a StorageClass name
+  name: timebase
+
+  # storageClass.allowVolumeExpansion - Set to false to prevent expansion
+  allowVolumeExpansion: true
+  ## storageClass.parameters -- StorageClass parameters
+  parameters:
+    type: gp2
+  ## storageClass.mountOptions -- StorageClass mount options
+  mountOptions: {}
+
+  ## storageClass.reclaimPolicy -- ReclaimPolicy field of the class, which can be either Delete or Retain
+  reclaimPolicy: Delete
+
+server:
+  image: finos/timebase-ce-server:6.1
+  imagePullPolicy: IfNotPresent
+  serial: ""
+  version: 5.0
+  maxEntriesPerSecond: 300
+  user: ""
+  password: ""
+  oauth: {}
+    # issuer: ""
+    # jwksUrl: ""
+    # clientId:
+    #   - A
+    #   - B
+  # server.url -- overwrite default url, must be like dxtick://user:password@timebase:8011
+  url: ""
+  gracefulShutdownTime: 60
+  debug: false
+  readOnlyUsers: {}
+  adminUsers: {}
+  securityContext:
+    runAsUser: 1801
+    runAsGroup: 1801
+    fsGroup: 1801
+
+  # heapSize: 4gb
+  initContainers: {}
+  # server.resources -- Configure the resources for the timebase server
+  resources:
+    requests:
+      cpu: 2
+      memory: 4Gi
+    limits:
+      cpu: 4
+      memory: 6Gi
+  persistence:
+    accessModes: "ReadWriteOnce"
+    size: 10Gi
+    ## Timebase data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: gp2
+  # server.podLabels -- Additional pod labels
+  podLabels: {}
+  podAnnotations: {}
+
+  properties:
+    # server.properties.enableRemoteAccess -- Enable/disable Remote Access
+    enableRemoteAccess: false
+    # server.properties.lingerInterval -- Connection Linger Time
+    lingerInterval: "5S"
+    # server.properties.maxConnections -- The maximum number of concurrent connections that the server will accept and process.
+    maxConnections: 100
+    # server.properties.readOnly -- Read-only mode
+    readOnly: false
+    # server.properties.safeMode -- Using Save Mode will provide additional logging and disable streams with errors on startup
+    safeMode: false
+
+  secret:
+    create: true
+
+  logs:
+    gelf: true
+    host: ""
+    port: ""
+    logLevel: INFO # log level is set to INFO by Default
+    maxEntriesPerSecond: 300 # max entries is set to 300 by Default
+    app: timebase-server
+    
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    interval: "30s"
+    labels:
+      monitoring: application
+
+admin:
+  enabled: true
+  image: epam/timebase-ws-server:1.0.2
+  imagePullPolicy: IfNotPresent
+  # admin.resources -- Configure the resources for the timebase web admin
+  headless: false
+  resources:
+    requests:
+      cpu: 0.2
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+  # admin.podLabels -- Additional pod labels
+  podLabels: {}
+  podAnnotations: {}
+  env: {}
+
+  headless:
+    enabled: false
+    annotations: {}
+
+  secret:
+    create: true
+    records:
+      SECURITY_OAUTH2_USERS_0_USERNAME: admin
+      # bcrypt(10) admin
+      SECURITY_OAUTH2_USERS_0_PASSWORD: "$2y$10$B8iNWMVVfsFDw/HfmRfITue17k7yfnisO92Q93KcB31/qLWKw.XtS"
+      SECURITY_OAUTH2_USERS_0_AUTHORITIES: "TB_ALLOW_READ, TB_ALLOW_WRITE"
+
+
+  logs:
+    logLevel: INFO # log level is set to INFO by Default
+    maxEntriesPerSecond: 300 # max entries is set to 300 by Default
+    app: timebase-admin
+
+  ingress:
+    enabled: false
+    # Values can be templated
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    path: /*
+    hosts:
+    - chart-example.local
+    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    extraPaths: []
+    # - path: /*
+    #   backend:
+    #     serviceName: ssl-redirect
+    #     servicePort: use-annotation
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+
+# headless:
+#   annotations:
+#     external-dns.alpha.kubernetes.io/ttl: "30"
+
+
+loadBalancer:
+  enabled: false
+  annotations: {}
+  spec: {}
+
+backupper:
+  enabled: false
+  image: finos/timebase-ce-client:6.1
+
+  imagePullPolicy: IfNotPresent
+  accesskey: ""
+  secretkey: ""
+  bucketname: ""
+  region: ""
+  streams:
+    - accounts
+    - deals
+    - orders
+    - transactions
+    - users
+
+cleaner:
+  enabled: false
+  image: finos/timebase-ce-client:6.1
+  imagePullPolicy: IfNotPresent
+  schedule: "0 7 * * *" # Default is 07:00 UTC
+  daystoKeep: 1 # Default is 1
+  streams: {}
+    # coinbase.data: 1
+    # coinbase-sim.data: 1
+    # gemini.data: 1
+  exceptStreams: []
+    # - coinbase-test.data
+    # - gemini2.data
