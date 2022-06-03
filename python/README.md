@@ -1,13 +1,18 @@
 # Python Timebase Clinent samples
 
-Install python timebase-client package from pipy repository first:
+## How to install python timebase-client 
+
+There are 2 ways to install python client:
+
+1) Install python timebase-client package from pipy repository:
 
 ```
 Will be added soon.
 ```
 
-Install python timebase-client from github release:
-
+2) Or you can download python timebase-client from [github release](https://github.com/epam/TimeBaseClientPython/releases)      
+ [timebase_client-6.0.1-py2.py3-none-any.whl](https://github.com/epam/TimeBaseClientPython/releases/download/6.0.1/timebase_client-6.0.1-py2.py3-none-any.whl)     
+and install it using pip:
 ```
-https://github.com/epam/TimeBaseClientPython/tags
+pip install timebase_client-6.0.1-py2.py3-none-any.whl
 ```
