@@ -15,11 +15,11 @@ try:
     print('Connected to ' + timebase)
 
     # read QQL from file
-    with open('qql/bars1min.qql', 'r') as qqlFile:
-        barsQQL = qqlFile.read()
+    with open('qql/sample_l2.qql', 'r') as qqlFile:
+        qql = qqlFile.read()
 
     # execute QQL and check result
-    cursor = db.executeQuery(barsQQL)
+    cursor = db.executeQuery(qql)
     try:
         if (cursor.next()):
             message = cursor.getMessage()

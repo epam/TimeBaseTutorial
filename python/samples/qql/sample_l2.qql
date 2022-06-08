@@ -1,0 +1,148 @@
+CREATE DURABLE STREAM "sample_l2" (
+    CLASS "com.epam.deltix.timebase.messages.MarketMessage" 'Market Message' (
+        "currency" VARCHAR ALPHANUMERIC (10),
+        "originalTimestamp" TIMESTAMP,
+        "sequenceNumber" INTEGER,
+        "sourceId" VARCHAR ALPHANUMERIC (10)
+    )
+        AUXILIARY;
+    ENUM "com.epam.deltix.timebase.messages.service.FeedStatus" 'Security Feed Status' (
+        "AVAILABLE" = 0,
+        "NOT_AVAILABLE" = 1
+    );
+    CLASS "com.epam.deltix.timebase.messages.service.SecurityFeedStatusMessage" 'Security StatusMessage' (
+        "cause" 'Cause' VARCHAR,
+        "exchangeId" 'ExchangeId' INTEGER,
+        "originalStatus" 'OriginalStatus' VARCHAR,
+        "status" 'Status' "com.epam.deltix.timebase.messages.service.FeedStatus"
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.BaseEntry" 'Base Entry' (
+        "contractId" 'Contract ID' VARCHAR ALPHANUMERIC (10),
+        "exchangeId" 'Exchange Code' VARCHAR ALPHANUMERIC (10),
+        "isImplied" 'Is Implied' BOOLEAN
+    )
+        AUXILIARY;
+    CLASS "com.epam.deltix.timebase.messages.universal.BasePriceEntry" 'Base Price Entry' UNDER "com.epam.deltix.timebase.messages.universal.BaseEntry" (
+        "numberOfOrders" 'Number Of Orders' INTEGER,
+        "participantId" 'Participant' VARCHAR,
+        "price" 'Price' FLOAT DECIMAL64,
+        "quoteId" 'Quote ID' VARCHAR,
+        "size" 'Size' FLOAT DECIMAL64
+    )
+        AUXILIARY;
+    ENUM "com.epam.deltix.timebase.messages.universal.DataModelType" (
+        "LEVEL_ONE" = 0,
+        "LEVEL_TWO" = 1,
+        "LEVEL_THREE" = 2,
+        "MAX" = 3
+    );
+    ENUM "com.epam.deltix.timebase.messages.universal.QuoteSide" (
+        "BID" = 0,
+        "ASK" = 1
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.BookResetEntry" 'Book Reset Entry' UNDER "com.epam.deltix.timebase.messages.universal.BaseEntry" (
+        "modelType" 'Model Type' "com.epam.deltix.timebase.messages.universal.DataModelType" NOT NULL,
+        "side" 'Side' "com.epam.deltix.timebase.messages.universal.QuoteSide"
+    )
+        AUXILIARY;
+    ENUM "com.epam.deltix.timebase.messages.universal.InsertType" 'Insert Type' (
+        "ADD_BACK" = 0,
+        "ADD_FRONT" = 1,
+        "ADD_BEFORE" = 2
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.L1Entry" 'L1Entry' UNDER "com.epam.deltix.timebase.messages.universal.BasePriceEntry" (
+        "isNational" 'Is National' BOOLEAN,
+        "side" 'Side' "com.epam.deltix.timebase.messages.universal.QuoteSide" NOT NULL
+    )
+        AUXILIARY;
+    CLASS "com.epam.deltix.timebase.messages.universal.L2EntryNew" 'L2EntryNew' UNDER "com.epam.deltix.timebase.messages.universal.BasePriceEntry" (
+        "level" 'Level Index' INTEGER NOT NULL SIGNED (16),
+        "side" 'Side' "com.epam.deltix.timebase.messages.universal.QuoteSide" NOT NULL
+    )
+        AUXILIARY;
+    ENUM "deltix.timebase.api.messages.BookUpdateAction" 'Book Update Action' (
+        "INSERT" = 0,
+        "UPDATE" = 1,
+        "DELETE" = 2
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.L2EntryUpdate" 'L2EntryUpdate' UNDER "com.epam.deltix.timebase.messages.universal.BasePriceEntry" (
+        "action" 'Action' "deltix.timebase.api.messages.BookUpdateAction" NOT NULL,
+        "level" 'Level Index' INTEGER NOT NULL SIGNED (16),
+        "side" 'Side' "com.epam.deltix.timebase.messages.universal.QuoteSide"
+    )
+        AUXILIARY;
+    CLASS "com.epam.deltix.timebase.messages.universal.L3EntryNew" 'L3EntryNew' UNDER "com.epam.deltix.timebase.messages.universal.BasePriceEntry" (
+        "insertBeforeQuoteId" VARCHAR,
+        "insertType" "com.epam.deltix.timebase.messages.universal.InsertType",
+        "side" 'Side' "com.epam.deltix.timebase.messages.universal.QuoteSide" NOT NULL
+    )
+        AUXILIARY;
+    ENUM "com.epam.deltix.timebase.messages.universal.QuoteUpdateAction" (
+        "CANCEL" = 0,
+        "MODIFY" = 1,
+        "REPLACE" = 2
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.L3EntryUpdate" 'L3 Entry Update' UNDER "com.epam.deltix.timebase.messages.universal.BasePriceEntry" (
+        "action" 'Action' "com.epam.deltix.timebase.messages.universal.QuoteUpdateAction" NOT NULL,
+        "side" 'Side' "com.epam.deltix.timebase.messages.universal.QuoteSide"
+    )
+        AUXILIARY;
+    ENUM "deltix.timebase.api.messages.AggressorSide" 'Aggressor Side' (
+        "BUY" = 0,
+        "SELL" = 1
+    );
+    ENUM "com.epam.deltix.timebase.messages.universal.TradeType" (
+        "REGULAR_TRADE" = 0,
+        "AUCTION_CLEARING_PRICE" = 1,
+        "CORRECTION" = 2,
+        "CANCELLATION" = 3,
+        "UNKNOWN" = 20
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.TradeEntry" 'Trade Entry' UNDER "com.epam.deltix.timebase.messages.universal.BaseEntry" (
+        "buyerNumberOfOrders" 'Buyer Number Of Orders' INTEGER,
+        "buyerOrderId" 'Buyer Order ID' VARCHAR,
+        "buyerParticipantId" 'Buyer Participant ID' VARCHAR,
+        "condition" 'Condition' VARCHAR,
+        "matchId" 'Match ID' VARCHAR,
+        "price" 'Price' FLOAT DECIMAL64,
+        "sellerNumberOfOrders" 'Seller Number Of Orders' INTEGER,
+        "sellerOrderId" 'Seller Order ID' VARCHAR,
+        "sellerParticipantId" 'Seller Participant ID' VARCHAR,
+        "side" 'Side' "deltix.timebase.api.messages.AggressorSide",
+        "size" 'Size' FLOAT DECIMAL64,
+        "tradeType" 'Trade Type' "com.epam.deltix.timebase.messages.universal.TradeType"
+    )
+        AUXILIARY;
+    ENUM "com.epam.deltix.timebase.messages.universal.StatisticsType" 'Statistics Type' (
+        "CUSTOM" = 1,
+        "OPENING_PRICE" = 2,
+        "CLOSING_PRICE" = 3,
+        "SETTLEMENT_PRICE" = 4,
+        "TRADING_SESSION_HIGH_PRICE" = 5,
+        "TRADING_SESSION_LOW_PRICE" = 6,
+        "TRADING_SESSION_VWAP_PRICE" = 7,
+        "TRADE_VOLUME" = 8,
+        "OPEN_INTEREST" = 9,
+        "SESSION_HIGH_BID" = 10,
+        "SESSION_LOW_OFFER" = 11,
+        "AUCTION_CLEARING_PRICE" = 12,
+        "FIXING_PRICE" = 13
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.StatisticsEntry" 'StatisticsEntry' UNDER "com.epam.deltix.timebase.messages.universal.BaseEntry" (
+        "originalType" 'OriginalType' VARCHAR,
+        "type" 'Type' "com.epam.deltix.timebase.messages.universal.StatisticsType",
+        "value" 'Value' FLOAT DECIMAL64
+    )
+        AUXILIARY;
+    ENUM "com.epam.deltix.timebase.messages.universal.PackageType" 'Package Type' (
+        "VENDOR_SNAPSHOT" = 0,
+        "PERIODICAL_SNAPSHOT" = 1,
+        "INCREMENTAL_UPDATE" = 2
+    );
+    CLASS "com.epam.deltix.timebase.messages.universal.PackageHeader" 'Package Header' UNDER "com.epam.deltix.timebase.messages.MarketMessage" (
+        "entries" 'Entries' ARRAY(OBJECT("com.epam.deltix.timebase.messages.universal.TradeEntry", "com.epam.deltix.timebase.messages.universal.L1Entry", "com.epam.deltix.timebase.messages.universal.L2EntryNew", "com.epam.deltix.timebase.messages.universal.L2EntryUpdate", "com.epam.deltix.timebase.messages.universal.L3EntryNew", "com.epam.deltix.timebase.messages.universal.L3EntryUpdate", "com.epam.deltix.timebase.messages.universal.BookResetEntry", "com.epam.deltix.timebase.messages.universal.StatisticsEntry") NOT NULL) NOT NULL,
+        "packageType" 'Package Type' "com.epam.deltix.timebase.messages.universal.PackageType" NOT NULL
+    );
+)
+OPTIONS (POLYMORPHIC; PERIODICITY = 'IRREGULAR'; HIGHAVAILABILITY = FALSE)
+COMMENT 'sample_l2 stream'

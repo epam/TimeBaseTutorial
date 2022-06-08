@@ -19,11 +19,28 @@ try:
     print('Connected to ' + timebase)
 
     # Define name of the stream    
-    streamKey = 'bitfinex'
+    streamKey = 'sample_l2'
     
     # Get stream from the timebase
     stream = db.getStream(streamKey)
     
+    # if stream not found, try to create new
+    if stream == None:
+        print('Stream ' + streamKey + ' not exitsts, creating new one...')
+        # read QQL from file
+        with open('qql/' + streamKey + '.qql', 'r') as qqlFile:
+            qql = qqlFile.read()
+
+        # execute QQL and check result
+        with db.tryExecuteQuery(qql) as cursor:
+            if (cursor.next()):
+                print('Query result: ' + cursor.getMessage().messageText)
+        
+        # request newly created stream
+        stream = db.getStream(streamKey)
+        if stream == None:
+            raise Exception('Failed to create stream')
+            
     # Create a Message Loader for the selected stream and provide loading options
     loader = stream.createLoader(tbapi.LoadingOptions())
     
@@ -33,15 +50,14 @@ try:
     # Define message type name according to the Timebase schema type name
     # For the polymorphic streams, each message should have defined typeName to distinct messages on Timebase Server level.
     packageHeader.typeName = 'com.epam.deltix.timebase.messages.universal.PackageHeader'
-    packageHeader.symbol = 'BTC/USD'
     packageHeader.currencyCode = 999
     packageHeader.packageType = 'VENDOR_SNAPSHOT'
     
     print('Start loading to ' + streamKey)    
     
     count = 0
-    currentValue = 1.1
-    for i in range(10):    
+    currentValue = 100.1
+    for i in range(20):    
         # get current time in UTC
         now = datetime.utcnow() - datetime(1970, 1, 1)
         
@@ -49,12 +65,23 @@ try:
         ns = now.total_seconds() * 1e9 + now.microseconds * 1000;
         
         currentValue = currentValue + 1.1
+        packageHeader.symbol = 'BTC/USD' if i % 2 == 0 else 'BTC/EUR'
         packageHeader.entries = []
         for j in range(5):
             entry = tbapi.InstrumentMessage()
             entry.typeName = 'com.epam.deltix.timebase.messages.universal.L2EntryNew'
-            entry.exchangeId = 'GDAX'
-            entry.price = currentValue
+            entry.exchangeId = 'SAMPLE'
+            entry.price = currentValue + j
+            entry.size = currentValue
+            entry.level = j
+            entry.side = 'ASK'
+            packageHeader.entries.append(entry)
+            
+        for j in range(5):
+            entry = tbapi.InstrumentMessage()
+            entry.typeName = 'com.epam.deltix.timebase.messages.universal.L2EntryNew'
+            entry.exchangeId = 'SAMPLE'
+            entry.price = currentValue - j
             entry.size = currentValue
             entry.level = j
             entry.side = 'BID'
@@ -74,7 +101,6 @@ finally:
     if db.isOpen():
         db.close()
         print("Connection " + timebase + " closed.")
-
 
 
 

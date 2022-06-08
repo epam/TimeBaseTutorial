@@ -19,10 +19,12 @@ try:
     print('Connected to ' + timebase)
 
     # Define name of the stream    
-    streamKey = 'bitfinex'
+    streamKey = 'sample_l2'
 
     # Get stream from the timebase
-    stream = db.getStream(streamKey)    
+    stream = db.getStream(streamKey)   
+    if stream == None:
+        raise Exception('Stream ' + streamKey + ' not found, please, create stream')    
        	
     # Create cursor with empty subscription
     cursor = db.createCursor(None, tbapi.SelectionOptions())
