@@ -36,7 +36,7 @@ storageClass:
   reclaimPolicy: Delete
 
 server:
-  image: finos/timebase-ce-server:6.1
+  image: finos/timebase-ce-server:6.1.9
   imagePullPolicy: IfNotPresent
   serial: ""
   version: 5.0
