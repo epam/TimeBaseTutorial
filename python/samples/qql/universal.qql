@@ -1,4 +1,4 @@
-CREATE DURABLE STREAM "sample_l2" (
+CREATE DURABLE STREAM "universal" (
     CLASS "com.epam.deltix.timebase.messages.MarketMessage" 'Market Message' (
         "currency" VARCHAR ALPHANUMERIC (10),
         "originalTimestamp" TIMESTAMP,

@@ -19,7 +19,7 @@ try:
     print('Connected to ' + timebase)
 
     # Define name of the stream
-    streamKey = 'sample_l2'
+    streamKey = 'bars'
 
     # Get stream from the timebase
     stream = db.getStream(streamKey)
@@ -27,10 +27,13 @@ try:
         raise Exception('Stream ' + streamKey + ' not found, please, create stream')
 
     # List of message types to subscribe (if None, all stream types will be used)
-    types = ['com.epam.deltix.timebase.messages.universal.PackageHeader']
+    types = ['com.epam.deltix.timebase.messages.BarMessage']
 
     # List of entities to subscribe (if None, all stream entities will be used)
-    entities = ['BTC/USD', 'BTC/EUR']
+    entities = [
+        'MSFT',
+        'AAPL'
+    ]
 
     # Define subscription start time
     time = datetime(2010, 1, 1, 0, 0)
@@ -48,18 +51,8 @@ try:
             time = message.timestamp/1e9
             messageTime = datetime.utcfromtimestamp(time)
             
-            if message.typeName == 'com.epam.deltix.timebase.messages.universal.PackageHeader':
-                print("================================================")
-                print("PackageHeader timestamp: " + str(messageTime) + ", symbol: " + message.symbol + ", package type: " + message.packageType)
-                for entry in message.entries:
-                    if entry.typeName == 'com.epam.deltix.timebase.messages.universal.L2EntryNew':
-                        print("NEW: " + str(entry.level) + ": " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
-                    elif entry.typeName == 'com.epam.deltix.timebase.messages.universal.L2EntryUpdate':
-                        print("UPDATE [" + entry.action + "]: " + str(entry.level) + ": " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
-                    elif entry.typeName == 'com.epam.deltix.timebase.messages.universal.L1Entry':
-                        print("L1Entry: " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
-                    elif entry.typeName == 'com.epam.deltix.timebase.messages.universal.TradeEntry':
-                        print("Trade: " + str(entry.side) + " " + str(entry.size) + " @ " + str(entry.price) + " (" + str(entry.exchangeId) + ")")
+            if message.typeName == 'com.epam.deltix.timebase.messages.BarMessage':
+                print("Bar " + message.symbol + " (" + str(messageTime) + ") close price: " + str(message.close))
     finally:
         # cursor should be closed anyway
         cursor.close()

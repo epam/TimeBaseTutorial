@@ -20,7 +20,7 @@ def main():
         print('Connected to ' + timebase)
 
         # Define name of the stream    
-        streamKey = 'bars'
+        streamKey = 'universal'
         
         # Get stream from the timebase
         stream = db.getStream(streamKey)
@@ -33,33 +33,48 @@ def main():
         # Create a Message Loader for the selected stream and provide loading options
         loader = stream.createLoader(tbapi.LoadingOptions())
         
-        # Create BestBidOffer message
-        barMessage = tbapi.InstrumentMessage()
+        # Create PackageHeader message
+        packageHeader = tbapi.InstrumentMessage()
         
         # Define message type name according to the Timebase schema type name
-        barMessage.typeName = 'com.epam.deltix.timebase.messages.BarMessage'
+        # For the polymorphic streams, each message should have defined typeName to distinct messages on Timebase Server level.
+        packageHeader.typeName = 'com.epam.deltix.timebase.messages.universal.PackageHeader'
+        packageHeader.symbol = 'BTCUSD'
+        packageHeader.currencyCode = 999
+        packageHeader.packageType = 'VENDOR_SNAPSHOT'
         
         print('Start loading to ' + streamKey)    
         
-        for i in range(100):    
-            # Define instrument information
-            barMessage.symbol = 'AAPL' if i % 2 == 0 else 'MSFT'
-                        
-            # Define other message properties
-            barMessage.originalTimestamp = 0
+        count = 0
+        currentValue = 100.1
+        for i in range(10):
+            currentValue = currentValue + 1.1
+            packageHeader.entries = []
+            for j in range(5):
+                entry = tbapi.InstrumentMessage()
+                entry.typeName = 'com.epam.deltix.timebase.messages.universal.L2EntryNew'
+                entry.exchangeId = 'GDAX'
+                entry.price = currentValue - j * 1.1
+                entry.size = currentValue - j * 0.1
+                entry.level = j
+                entry.side = 'BID'
+                packageHeader.entries.append(entry)
             
-            # 'undefined' currency code
-            barMessage.currencyCode = 999
-            barMessage.exchangeId = 'NYSE'
-            barMessage.open = 10.0 + i * 2.2
-            barMessage.close = 20.0 + i * 3.3
-            barMessage.high = 30.0 + i * 4.4
-            barMessage.low = 40.0 + i * 5.5
-            barMessage.volume = 60.0 + i * 6.6
-            
-            # Send message
-            loader.send(barMessage)
+            for j in range(5):
+                entry = tbapi.InstrumentMessage()
+                entry.typeName = 'com.epam.deltix.timebase.messages.universal.L2EntryNew'
+                entry.exchangeId = 'GDAX'
+                entry.price = currentValue + j * 1.1
+                entry.size = currentValue + j * 0.1
+                entry.level = j
+                entry.side = 'ASK'
+                packageHeader.entries.append(entry)
                 
+            # Send message
+            loader.send(packageHeader)
+            count = count + 1
+                
+        print("Sent " + str(count) + " messages")
         # close Message Loader
         loader.close()
         loader = None

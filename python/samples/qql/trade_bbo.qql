@@ -1,0 +1,71 @@
+CREATE DURABLE STREAM "trade_bbo" (
+    ENUM "com.epam.deltix.timebase.messages.AggressorSide" 'Aggressor Side' (
+        "BUY" = 0,
+        "SELL" = 1
+    );
+    CLASS "com.epam.deltix.timebase.messages.MarketMessage" (
+        STATIC "originalTimestamp" 'Original Time' TIMESTAMP = NULL,
+        "currencyCode" 'Currency Code' INTEGER SIGNED (16),
+        "sequenceNumber" 'Sequence Number' INTEGER
+    )
+        AUXILIARY
+        NOT INSTANTIABLE;
+    CLASS "com.epam.deltix.timebase.messages.BestBidOfferMessage" UNDER "com.epam.deltix.timebase.messages.MarketMessage" (
+        STATIC "isNational" 'National BBO' BOOLEAN = true,
+        "bidPrice" 'Bid Price' FLOAT DECIMAL,
+        "bidSize" 'Bid Size' FLOAT DECIMAL,
+        "bidExchangeId" 'Bid Exchange' VARCHAR ALPHANUMERIC (10),
+        "offerPrice" 'Offer Price' FLOAT DECIMAL,
+        "offerSize" 'Offer Size' FLOAT DECIMAL,
+        "offerExchangeId" 'Offer Exchange' VARCHAR ALPHANUMERIC (10)
+    );
+    ENUM "com.epam.deltix.timebase.messages.MarketEventType" 'Market Event Type' (
+        "BID" = 0,
+        "OFFER" = 1,
+        "TRADE" = 2,
+        "INDEX_VALUE" = 3,
+        "OPENING_PRICE" = 4,
+        "CLOSING_PRICE" = 5,
+        "SETTLEMENT_PRICE" = 6,
+        "TRADING_SESSION_HIGH_PRICE" = 7,
+        "TRADING_SESSION_LOW_PRICE" = 8,
+        "TRADING_SESSION_VWAP_PRICE" = 9,
+        "IMBALANCE" = 10,
+        "TRADE_VOLUME" = 11,
+        "OPEN_INTEREST" = 12,
+        "COMPOSITE_UNDERLYING_PRICE" = 13,
+        "SIMULATED_SELL_PRICE" = 14,
+        "SIMULATED_BUY_PRICE" = 15,
+        "MARGIN_RATE" = 16,
+        "MID_PRICE" = 17,
+        "EMPTY_BOOK" = 18,
+        "SETTLE_HIGH_PRICE" = 19,
+        "SETTLE_LOW_PRICE" = 20,
+        "PRIOR_SETTLE_PRICE" = 21,
+        "SESSION_HIGH_BID" = 22,
+        "SESSION_LOW_OFFER" = 23,
+        "EARLY_PRICE" = 24,
+        "AUCTION_CLEARING_PRICE" = 25,
+        "SWAP_VALUE_FACTOR" = 26,
+        "VALUE_ADJ_LONG" = 27,
+        "CUMMULATIVE_VALUE_ADJ_LONG" = 28,
+        "DAILY_VALUE_ADJ_SHORT" = 29,
+        "CUMMULATIVE_VALUE_ADJ_SHORT" = 30,
+        "FIXING_PRICE" = 31,
+        "CASH_RATE" = 32,
+        "RECOVERY_RATE" = 33,
+        "RECOVERY_RATE_LONG" = 34,
+        "RECOVERY_RATE_SHORT" = 35
+    );
+    CLASS "com.epam.deltix.timebase.messages.TradeMessage" UNDER "com.epam.deltix.timebase.messages.MarketMessage" (
+        "exchangeId" 'Exchange Code' VARCHAR ALPHANUMERIC (10),
+        "price" 'Price' FLOAT DECIMAL,
+        "size" 'Size' FLOAT DECIMAL,
+        "condition" 'Trade Condition' VARCHAR,
+        "aggressorSide" 'Aggressor Side' "com.epam.deltix.timebase.messages.AggressorSide",
+        "netPriceChange" 'Net Price Change' FLOAT DECIMAL,
+        "eventType" 'Event Type' "com.epam.deltix.timebase.messages.MarketEventType"
+    );
+)
+OPTIONS (POLYMORPHIC; PERIODICITY = 'IRREGULAR'; HIGHAVAILABILITY = FALSE)
+COMMENT 'trade_bbo'
