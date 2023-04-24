@@ -2,16 +2,16 @@
 
 ## How to configure jupyterlab
 
-Python 3.8+ is required
+Python 3.9+ is required
 
 1) install jupyterlab from pip:
 ```
-   pip install jupyterlab==3.4.0
+   pip install jupyterlab==3.4.8
 ```
 
 3) install perspective python module:
 ```
-   pip install perspective-python==1.3.5
+   pip install perspective-python
 ```
 
 5) install additional python modules if not installed (`ipywidgets`, `sortedcollections`)
@@ -24,8 +24,8 @@ Python 3.8+ is required
 
 8) install jupyterlab perspective extensions:
 ```
-jupyter labextension install @finos/perspective-jupyterlab@1.3.12
-jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.1.0
+jupyter labextension install @finos/perspective-jupyterlab
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
 ```
 
 9) start jupyter lab from this directory:
