@@ -1,4 +1,4 @@
-jupyterlab==3.4.0
+jupyterlab==3.4.8
 perspective-python==1.3.5
 ipywidgets
 sortedcollections
