@@ -1,0 +1,30 @@
+# IDEs and editors
+.gradle/
+/.idea
+/.classpath
+/.metadata
+/.plugins
+/.project
+/.settings
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.iml
+*.ipr
+*.iws
+
+# compiled output
+/dist
+/distribution
+/**/bin
+/tmp
+/out-tsc
+/**/out
+/**/build
+/**/lib
+
+# custom files
+/java/ws-server/lombok.config
+/docs/devguide.zip
+/web/frontend/proxy-dev.conf.json

@@ -1,0 +1,22 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'base'
+} 
+
+apply plugin: 'java-library'
+apply plugin: 'java'
+
+group 'com.epam.deltix'
+
+dependencies {
+    implementation "org.finos.timebase-ce:timebase-computations-api:$timebaseVersion"
+}
+
+repositories {
+    mavenCentral()
+}
