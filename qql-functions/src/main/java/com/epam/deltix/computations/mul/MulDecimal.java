@@ -14,28 +14,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.epam.deltix.mul;
+package com.epam.deltix.computations.mul;
 
 import com.epam.deltix.computations.api.annotations.BuiltInTimestampMs;
 import com.epam.deltix.computations.api.annotations.Compute;
 import com.epam.deltix.computations.api.annotations.Function;
-import com.epam.deltix.computations.api.generated.DoubleToDoubleStatefulFunctionBase;
+import com.epam.deltix.computations.api.generated.DecimalToDecimalStatefulFunctionBase;
+import com.epam.deltix.dfp.Decimal;
+import com.epam.deltix.dfp.Decimal64Utils;
 import com.epam.deltix.qsrv.hf.pub.md.TimebaseTypes;
 
-@Function("Mul")
-public class MulDouble extends DoubleToDoubleStatefulFunctionBase {
+@Function("MUL")
+public class MulDecimal extends DecimalToDecimalStatefulFunctionBase {
 
     @Compute
     @Override
-    public void compute(@BuiltInTimestampMs long timestamp, double v) {
-        if (TimebaseTypes.isNull(v)) {
+    public void compute(@BuiltInTimestampMs long timestamp, @Decimal long v) {
+        if (TimebaseTypes.isDecimalNull(v)) {
             return;
         }
-        if (TimebaseTypes.isNull(value)) {
+        if (TimebaseTypes.isDecimalNull(value)) {
             value = v;
         } else {
-            value *= v;
+            value = Decimal64Utils.multiply(value, v);
         }
     }
-
 }

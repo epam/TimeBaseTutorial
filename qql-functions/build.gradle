@@ -15,6 +15,7 @@ group 'com.epam.deltix'
 
 dependencies {
     implementation "org.finos.timebase-ce:timebase-computations-api:$timebaseVersion"
+    implementation ("com.epam.deltix:dfp:$dfpVersion")
 }
 
 repositories {

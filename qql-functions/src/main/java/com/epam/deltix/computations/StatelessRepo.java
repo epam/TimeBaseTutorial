@@ -14,28 +14,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.epam.deltix.mul;
+package com.epam.deltix.computations;
 
-import com.epam.deltix.computations.api.annotations.BuiltInTimestampMs;
-import com.epam.deltix.computations.api.annotations.Compute;
 import com.epam.deltix.computations.api.annotations.Function;
-import com.epam.deltix.computations.api.generated.IntToDecimalStatefulFunctionBase;
+import com.epam.deltix.computations.api.annotations.FunctionsRepo;
+import com.epam.deltix.dfp.Decimal;
 import com.epam.deltix.dfp.Decimal64Utils;
-import com.epam.deltix.qsrv.hf.pub.md.TimebaseTypes;
 
-@Function("MUL")
-public class MulInt extends IntToDecimalStatefulFunctionBase {
+@FunctionsRepo
+public class StatelessRepo {
 
-    @Compute
-    @Override
-    public void compute(@BuiltInTimestampMs long timestamp, int v) {
-        if (TimebaseTypes.isNull(v)) {
-            return;
-        }
-        if (TimebaseTypes.isDecimalNull(value)) {
-            value = Decimal64Utils.fromInt(v);
-        } else {
-            value = Decimal64Utils.multiply(value, Decimal64Utils.fromInt(v));
-        }
+    @Function("RANDOM")
+    @Decimal
+    public static long range() {
+        return Decimal64Utils.fromDouble(Math.random());
     }
+
 }
