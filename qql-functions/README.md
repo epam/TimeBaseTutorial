@@ -28,6 +28,10 @@ SELECT running n, mul{}(n), random(), avg{}(random())
 ARRAY JOIN range(1, 10) as n
 ```
 
+```
+SELECT RUNNING tsCount{}() FROM "KRAKEN" 
+```
+
 You can find many function implementations in  
 [TimeBase server standard QQL functions.](https://github.com/finos/TimeBase-CE/tree/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations)
 For example, stateful [count{}()](https://github.com/finos/TimeBase-CE/blob/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations/stateful/Count.java) 
