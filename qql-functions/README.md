@@ -27,3 +27,8 @@ docker run -p 8011:8011 -v /path/to/TimeBaseTutorial/qql-functions/build/libs:/t
 SELECT running n, mul{}(n), random(), avg{}(random())
 ARRAY JOIN range(1, 10) as n
 ```
+
+You can find many function implementations in  
+[TimeBase server standard QQL functions.](https://github.com/finos/TimeBase-CE/tree/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations)
+For example, stateful [count{}()](https://github.com/finos/TimeBase-CE/blob/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations/stateful/Count.java) 
+and stateless [varchar functions](https://github.com/finos/TimeBase-CE/blob/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations/VarcharFunctions.java).
