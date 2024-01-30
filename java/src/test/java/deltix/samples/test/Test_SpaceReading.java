@@ -14,7 +14,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package deltix.samples.test;
+
+package deltix.samples.test;
 
 import com.epam.deltix.containers.CharSequenceUtils;
 import com.epam.deltix.qsrv.hf.pub.md.Introspector;
@@ -134,7 +135,7 @@ public class Test_SpaceReading extends TDBTestBase {
 
     private int countMessages(DXTickStream stream, String space) {
         SelectionOptions opts = new SelectionOptions();
-        opts.space = space;
+        opts.withSpace(space);
 
         int count = 0;
         try (TickCursor cursor = stream.select(Long.MIN_VALUE, opts, null, (CharSequence[]) null)) {

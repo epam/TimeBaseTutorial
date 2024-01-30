@@ -14,7 +14,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.epam.deltix.samples.timebase.basics;
+
+package com.epam.deltix.samples.timebase.basics;
 
 import com.epam.deltix.qsrv.hf.pub.*;
 import com.epam.deltix.qsrv.hf.pub.md.*;
@@ -44,7 +45,14 @@ public class Step5_QueryData {
 
         SelectionOptions            options = new SelectionOptions ();
 
-        options.typeLoader = new SimpleTypeLoader (null, QueryResult.class);
+        options.typeLoader = new SimpleTypeLoader() {
+            @Override
+            public Class<?> load(ClassDescriptor cd) throws ClassNotFoundException {
+                if (cd.getName().startsWith("QUERY"))
+                    return QueryResult.class;
+                return super.load(cd);
+            }
+        };
 
         InstrumentMessageSource     cursor =
             db.executeQuery (

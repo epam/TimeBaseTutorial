@@ -35,11 +35,7 @@ jupyter-lab
 
 ## How to build docker image
 
-1) copy timebase client python package `timebase_client-6.0.1-py2.py3-none-any.whl`
-from https://github.com/epam/TimeBaseClientPython/releases/tag/6.0.1 into this directory.
-Note, that this step is temporary until timebase client will be published into pypi.
-
-2) build docker image
+Run next command to build docker image:
 ```
 docker build -t jupyter-test:1.0 .
 ```

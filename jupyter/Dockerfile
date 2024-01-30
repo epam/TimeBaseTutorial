@@ -11,9 +11,12 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash && apt -y install node
 COPY . /demo
 WORKDIR /demo
 
+RUN curl -o timebase_client-6.0.1-py2.py3-none-any.whl https://github.com/epam/TimeBaseClientPython/releases/download/6.0.1/timebase_client-6.0.1-py2.py3-none-any.whl
+
 # install python dependencies
-RUN pip3 install jupyterlab==3.4.8 perspective-python ipywidgets sortedcollections && \ 
-    pip3 install timebase_client-6.0.1-py2.py3-none-any.whl
+RUN pip3 install timebase_client-6.0.1-py2.py3-none-any.whl && \
+	pip3 install jupyterlab==3.4.8 perspective-python ipywidgets sortedcollections 
+    
 
 # install jupyter extensions
 RUN jupyter labextension install @finos/perspective-jupyterlab && \ 

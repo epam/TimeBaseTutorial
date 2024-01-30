@@ -1,7 +1,5 @@
-plugins {
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
-    id 'java-library'
-}
+apply plugin: 'java'
+apply plugin: 'java-library'
 
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -12,29 +10,31 @@ repositories {
 
 dependencies {
 
-    compile "org.finos.timebase-ce:timebase-client:${timebaseVersion}"
+    implementation "org.finos.timebase-ce:timebase-client:${timebaseVersion}"
 //    api "org.finos.timebase-ce:timebase-api:${timebaseVersion}"
 //    api "org.finos.timebase-ce:timebase-pub:${timebaseVersion}"
 //    api "org.finos.timebase-ce:timebase-aerondirect:${timebaseVersion}"
 //
-    compile "com.epam.deltix:containers:3.1.2"
+    implementation "com.epam.deltix:containers:3.1.2"
 //
 //    implementation "com.epam.deltix:timebase-lang:${commonsVersion}"
 //    implementation "com.epam.deltix:timebase-util:${commonsVersion}"
 //    implementation "com.epam.deltix:timebase-messages:${commonsVersion}"
 //    implementation "com.epam.deltix:timebase-collections:${commonsVersion}"
 //
-//    implementation 'com.epam.deltix:dfp:0.11.01'
+    implementation 'com.epam.deltix:dfp:0.12.5'
     implementation "com.epam.deltix:gflog-api:${gflogVersion}"
 
-    implementation 'com.google.guava:guava:20.0'
+    implementation 'com.google.guava:guava:32.0.1-jre'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 
-    testImplementation "org.testcontainers:testcontainers:1.16.0"
+    testImplementation "org.testcontainers:testcontainers:1.17.6"
 
     testImplementation ("org.springframework:spring-context:${springVersion}")
     testImplementation ("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 }
 
 //resolutionStrategy {
@@ -44,7 +44,7 @@ dependencies {
 
 // ZIP with sample 
 task makeZIP(type: Zip) {
-    baseName = 'deltix-timebase-tutorial'
+    archiveFileName = 'deltix-timebase-tutorial'
 
     from('.') {
         include '**/*'
@@ -64,6 +64,11 @@ task copyLibs(type: Sync) {
     from project.jar.outputs.files
 
     into libDirectory
+}
+
+test {
+    useJUnitPlatform()
+    jvmArgs '-Dgflog.sync=true', '-Dgflog.console.appender.wrap=true' // sync logging to not mix up messages from different tests
 }
 
 test.onlyIf { Boolean.getBoolean('tests.run') }

@@ -14,7 +14,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package deltix.samples.test;
+
+package deltix.samples.test;
 
 import com.epam.deltix.qsrv.hf.pub.md.Introspector;
 import com.epam.deltix.qsrv.hf.pub.md.RecordClassDescriptor;
@@ -24,7 +25,6 @@ import com.epam.deltix.qsrv.hf.tickdb.pub.lock.DBLock;
 import com.epam.deltix.qsrv.hf.tickdb.pub.lock.LockType;
 import com.epam.deltix.samples.timebase.BarMessage;
 import com.epam.deltix.samples.timebase.BarsGenerator;
-import com.epam.deltix.samples.timebase.BarMessage;
 import com.epam.deltix.timebase.messages.InstrumentMessage;
 import com.epam.deltix.util.lang.Util;
 import org.junit.Test;
