@@ -1,2 +1,2 @@
 select count{}() from "order-book-test"
-select distinct venue as venue from "order-book-test" where SYMBOL IN ('S0:ABS-1') AND venue != 'Other' AND trade_type == 'tradeType1' AND level == '1'
+select distinct venue as venue from "order-book-test" where SYMBOL IN ('0-S:ABS-1') AND venue != 'Other' AND trade_type == 'tradeType1' AND level == '1'
