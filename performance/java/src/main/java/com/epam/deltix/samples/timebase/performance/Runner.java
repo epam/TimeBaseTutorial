@@ -140,8 +140,10 @@ public class Runner extends DefaultApplication {
 
             File dfile = new File(dataFile);
             if (dfile.exists()) {
-                System.out.println("1. Writing sample data into TimeBase using " + spaces + " spaces having " + TOTAL_MESSAGES_PER_SPACE + " messages per space.");
+                System.out.println("1. Writing sample data into TimeBase stream [" + stream + "] and create " + spaces + " spaces having " + TOTAL_MESSAGES_PER_SPACE + " messages per space.");
                 populateStream(db, stream, dfile, spaces);
+            } else {
+                System.out.println("1. Writing sample data into TimeBase. Skipped. No data file provided. Use -dataFile <path> argument");
             }
 
             System.out.println("2. Test queries performance: ");

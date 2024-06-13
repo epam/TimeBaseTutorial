@@ -1,5 +1,10 @@
-apply plugin: 'java'
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+}
+
+
 apply plugin: 'java-library'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -64,6 +69,10 @@ task copyLibs(type: Sync) {
 test {
     useJUnitPlatform()
     jvmArgs '-Dgflog.sync=true', '-Dgflog.console.appender.wrap=true' // sync logging to not mix up messages from different tests
+}
+
+shadowJar {
+    zip64 = true
 }
 
 test.onlyIf { Boolean.getBoolean('tests.run') }
