@@ -24,6 +24,7 @@ import com.epam.deltix.dfp.Decimal;
 import com.epam.deltix.dfp.Decimal64Utils;
 import com.epam.deltix.qsrv.hf.pub.md.TimebaseTypes;
 
+
 @Function("MUL")
 public class MulDecimal extends DecimalToDecimalStatefulFunctionBase {
 

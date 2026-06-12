@@ -14,11 +14,11 @@ gradlew clean build
 
 You will get `build/libs/qql-functions-<version>.jar`.
 
-2. The jar (`build/libs/qql-functions-<version>.jar`) should be placed under `TimeBase-CI/lib/custom` directory 
+2. The jar (`build/libs/qql-functions-<version>.jar`) should be placed under installation `QuantServer/lib/custom` directory 
 or mount to docker container under `/timebase-server/lib/custom`:
 
 ```
-docker run -p 8011:8011 -v /path/to/TimeBaseTutorial/qql-functions/build/libs:/timebase-server/lib/custom finos/timebase-ce-server:6.1
+docker run -p 8011:8011 -v /path/to/TimeBaseTutorial/qql-functions/build/libs:/timebase-server/lib/custom finos/timebase-ce-server:6.2
 ```
 
 3. Enjoy custom functions:
@@ -33,6 +33,6 @@ SELECT RUNNING tsCount{}() FROM "KRAKEN"
 ```
 
 You can find many function implementations in  
-[TimeBase server standard QQL functions.](https://github.com/finos/TimeBase-CE/tree/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations)
-For example, stateful [count{}()](https://github.com/finos/TimeBase-CE/blob/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations/stateful/Count.java) 
-and stateless [varchar functions](https://github.com/finos/TimeBase-CE/blob/main-6.1/java/timebase/computations-std/src/main/java/com/epam/deltix/computations/VarcharFunctions.java).
+[TimeBase server standard QQL functions.](https://github.com/finos/TimeBase-CE/tree/main-6.2/java/timebase/computations-std/src/main/java/com/epam/deltix/computations)
+For example, stateful [count{}()](https://github.com/finos/TimeBase-CE/blob/main-6.2/java/timebase/computations-std/src/main/java/com/epam/deltix/computations/stateful/Count.java) 
+and stateless [varchar functions](https://github.com/finos/TimeBase-CE/blob/main-6.2/java/timebase/computations-std/src/main/java/com/epam/deltix/computations/VarcharFunctions.java).

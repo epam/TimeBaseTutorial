@@ -1,5 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'java-library'
+apply plugin: 'idea'
+
 
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -11,30 +13,37 @@ repositories {
 dependencies {
 
     implementation "org.finos.timebase-ce:timebase-client:${timebaseVersion}"
-//    api "org.finos.timebase-ce:timebase-api:${timebaseVersion}"
-//    api "org.finos.timebase-ce:timebase-pub:${timebaseVersion}"
-//    api "org.finos.timebase-ce:timebase-aerondirect:${timebaseVersion}"
-//
+    api "org.finos.timebase-ce:timebase-api:${timebaseVersion}"
+    api "org.finos.timebase-ce:timebase-pub:${timebaseVersion}"
+    api "org.finos.timebase-ce:timebase-aerondirect:${timebaseVersion}"
+
     implementation "com.epam.deltix:containers:3.1.2"
-//
-//    implementation "com.epam.deltix:timebase-lang:${commonsVersion}"
-//    implementation "com.epam.deltix:timebase-util:${commonsVersion}"
-//    implementation "com.epam.deltix:timebase-messages:${commonsVersion}"
-//    implementation "com.epam.deltix:timebase-collections:${commonsVersion}"
-//
-    implementation 'com.epam.deltix:dfp:0.12.5'
+
+    implementation "com.epam.deltix:timebase-lang:${commonsVersion}"
+    implementation "com.epam.deltix:timebase-util:${commonsVersion}"
+    implementation "com.epam.deltix:timebase-messages:${commonsVersion}"
+    implementation "com.epam.deltix:timebase-collections:${commonsVersion}"
+
+    implementation 'com.epam.deltix:dfp:1.0.6'
     implementation "com.epam.deltix:gflog-api:${gflogVersion}"
 
-    implementation 'com.google.guava:guava:32.0.1-jre'
+    implementation 'com.google.guava:guava:33.4.8-jre'
 
     testImplementation 'junit:junit:4.13.2'
 
-    testImplementation "org.testcontainers:testcontainers:1.17.6"
+    testImplementation "org.testcontainers:testcontainers:1.21.4"
 
     testImplementation ("org.springframework:spring-context:${springVersion}")
     testImplementation ("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }
 
 //resolutionStrategy {
